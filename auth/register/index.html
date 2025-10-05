@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blikk | Register</title>
+    <meta
+      name="description"
+      content="Join Blikk by creating a free account. Sign up to post, explore, and connect with others in a vibrant, visual community."
+    />
+    <link rel="icon" type="image" href="/src/assets/Blikk-favicon.png" />
+    <script type="module" src="/src/app.js"></script>
+  </head>
+  <body class="min-h-screen grid grid-rows-[auto_1fr_auto]">
+    <header class="bg-brand-dark">
+      <nav class="container mx-auto px-4">
+        <div class="flex justify-between items-center py-4">
+          <div class="flex items-center space-x-4">
+            <img
+              src="../../src/assets/Blikk-logo.png"
+              alt="Blikk Logo"
+              class="h-8 w-auto"
+            />
+            <a href="/" class="text-white font-logo text-4xl">Blikk</a>
+          </div>
+          <div class="hidden md:flex items-center space-x-6">
+            <a
+              href="/"
+              class="py-2 text-white font-heading font-semibold text-lg hover:text-brand-hover transition duration-200"
+              >Home</a
+            >
+            <a
+              href="/profile/"
+              class="py-2 text-white font-heading font-semibold text-lg hover:text-brand-hover transition duration-200"
+              >My Profile</a
+            >
+            <div class="flex space-x-4">
+              <a
+                href="/auth/login/"
+                id="loginLink"
+                class="py-2 text-white font-heading font-semibold text-lg hover:text-brand-hover transition duration-200"
+                >Login</a
+              >
+              <a
+                href="/auth/register/"
+                id="registerLink"
+                class="py-2 text-white font-heading font-semibold text-lg hover:text-brand-hover transition duration-200 border-b-2 border-white"
+                >Register</a
+              >
+            </div>
+            <button
+              id="logoutButton"
+              class="hidden md:flex py-2 px-4 text-white font-heading font-semibold text-lg bg-yellow-600 hover:bg-yellow-700 transition duration-200 rounded-lg"
+            >
+              Logout
+            </button>
+          </div>
+          <div class="flex md:hidden items-center">
+            <button id="hamburger-button" class="text-white">
+              <svg
+                class="w-6 h-6"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M3 6h18M3 12h18M3 18h18"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="hidden" id="hamburger-menu">
+          <ul class="flex flex-col space-y-2 mt-4 items-center">
+            <li>
+              <a
+                href="/"
+                class="block py-2 text-white font-heading font-semibold text-lg hover:text-brand-hover transition duration-200"
+                >Home</a
+              >
+            </li>
+            <li>
+              <a
+                href="/profile/"
+                class="block py-2 text-white font-heading font-semibold text-lg hover:text-brand-hover transition duration-200"
+                >My Profile</a
+              >
+            </li>
+            <li>
+              <a
+                href="/auth/login/"
+                class="block py-2 text-white font-heading font-semibold text-lg hover:text-brand-hover transition duration-200"
+                >Login</a
+              >
+            </li>
+            <li>
+              <a
+                href="/auth/register/"
+                class="block py-2 text-white font-heading font-semibold text-lg hover:text-brand-hover transition duration-200 border-b-2 border-white"
+                >Register</a
+              >
+            </li>
+            <li>
+              <button
+                id="logoutButtonMobile"
+                class="py-2 px-4 mb-2 text-white font-heading font-semibold text-lg bg-yellow-600 hover:bg-yellow-700 transition duration-200 hidden rounded-lg"
+              >
+                Logout
+              </button>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+    <main class="bg-slate-50">
+      <div
+        id="toast-container"
+        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 max-w-xs w-full z-50 flex flex-col items-center gap-4"
+      ></div>
+      <h1 class="text-3xl font-heading text-center font-bold my-8">
+        Create your account
+      </h1>
+
+      <form name="register">
+        <fieldset
+          class="text-center container rounded-lg shadow-lg mx-auto sm:w-96 p-6 flex flex-col justify-between gap-6"
+        >
+          <div class="flex flex-col">
+            <label for="name" class="font-body text-lg">Name</label>
+            <input
+              id="name"
+              type="text"
+              name="name"
+              required
+              maxlength="20"
+              pattern="^[\w]+$"
+              title="Please enter a username using only letters and numbers"
+              class="border-solid border-brand-dark border-2 p-1"
+            />
+          </div>
+
+          <div class="flex flex-col">
+            <label for="email" class="font-body text-lg">Email</label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              required
+              pattern="^[\w\-.]+@(stud\.)?noroff\.no$"
+              title="Please enter a valid noroff.no or stud.noroff.no address"
+              class="border-solid border-brand-dark border-2 p-1"
+            />
+          </div>
+
+          <div class="flex flex-col">
+            <label for="password" class="font-body text-lg">Password</label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              required
+              minlength="8"
+              class="border-solid border-brand-dark border-2 p-1"
+            />
+          </div>
+
+          <button
+            class="font-body bg-brand-dark hover:bg-brand-hover text-white font-semibold p-2 rounded-full w-full m-0 text-lg"
+          >
+            Register
+          </button>
+          <p class="font-body">
+            Already a user?
+            <a
+              href="/auth/login/"
+              class="hover:text-brand-hover transition duration-200 border-b-2 border-black"
+              >Login</a
+            >
+          </p>
+        </fieldset>
+      </form>
+    </main>
+    <footer class="container mx-auto text-center bg-brand-dark max-w-full">
+      <p class="font-heading">Blikk | A Social media platform</p>
+      <p class="font-heading">Copyright &copy;</p>
+    </footer>
+  </body>
+</html>
