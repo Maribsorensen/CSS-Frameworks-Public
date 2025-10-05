@@ -4,24 +4,144 @@
     <meta charset="UTF-8" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Noroff FED2 JS2 CA</title>
+    <title>Blikk | Your Profile</title>
+    <meta
+      name="description"
+      content="View and edit your personal profile on Blikk. Share your latest posts, interact with content, and personalize your experience."
+    />
+
+    <link rel="icon" type="image" href="/src/assets/Blikk-favicon.png" />
     <script type="module" src="/src/app.js"></script>
   </head>
-  <body>
-    <header>
-      <form name="updateProfile">
-        <button>Update Profile</button>
-      </form>
-      <a href="/post/create/">Create Post</a>
-      <a href="/">Home</a>
-      <button id="logoutButton">Logout</button>
+  <body class="min-h-screen grid grid-rows-[auto_1fr_auto]">
+    <header class="bg-brand-dark">
+      <nav class="container mx-auto px-4">
+        <div class="flex justify-between items-center py-4">
+          <div class="flex items-center space-x-4">
+            <img
+              src="../../src/assets/Blikk-logo.png"
+              alt="Blikk Logo"
+              class="h-8 w-auto"
+            />
+            <a href="/" class="text-white font-logo text-4xl">Blikk</a>
+          </div>
+          <div class="hidden md:flex items-center space-x-6">
+            <a
+              href="/"
+              class="py-2 text-white font-heading font-semibold text-lg hover:text-brand-hover transition duration-200"
+              >Home</a
+            >
+            <a
+              href="/profile/"
+              class="py-2 text-white font-heading font-semibold text-lg hover:text-brand-hover transition duration-200 border-b-2 border-white"
+              >My Profile</a
+            >
+            <div class="flex space-x-4">
+              <a
+                href="/auth/login/"
+                id="loginLink"
+                class="py-2 text-white font-heading font-semibold text-lg hover:text-brand-hover transition duration-200"
+                >Login</a
+              >
+              <a
+                href="/auth/register/"
+                id="registerLink"
+                class="py-2 text-white font-heading font-semibold text-lg hover:text-brand-hover transition duration-200"
+                >Register</a
+              >
+            </div>
+            <button
+              id="logoutButton"
+              class="hidden md:flex py-2 px-4 text-white font-heading font-semibold text-lg bg-yellow-600 hover:bg-yellow-700 transition duration-200 rounded-lg"
+            >
+              Logout
+            </button>
+          </div>
+          <div class="flex md:hidden items-center">
+            <button id="hamburger-button" class="text-white">
+              <svg
+                class="w-6 h-6"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M3 6h18M3 12h18M3 18h18"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="hidden" id="hamburger-menu">
+          <ul class="flex flex-col space-y-2 mt-4 items-center">
+            <li>
+              <a
+                href="/"
+                class="block py-2 text-white font-heading font-semibold text-lg hover:text-brand-hover transition duration-200"
+                >Home</a
+              >
+            </li>
+            <li>
+              <a
+                href="/profile/"
+                class="block py-2 text-white font-heading font-semibold text-lg hover:text-brand-hover transition duration-200 border-b-2 border-white"
+                >My Profile</a
+              >
+            </li>
+            <li>
+              <a
+                href="/auth/login/"
+                class="block py-2 text-white font-heading font-semibold text-lg hover:text-brand-hover transition duration-200"
+                >Login</a
+              >
+            </li>
+            <li>
+              <a
+                href="/auth/register/"
+                class="block py-2 text-white font-heading font-semibold text-lg hover:text-brand-hover transition duration-200"
+                >Register</a
+              >
+            </li>
+            <li>
+              <button
+                id="logoutButtonMobile"
+                class="py-2 px-4 mb-2 text-white font-heading font-semibold text-lg bg-yellow-600 hover:bg-yellow-700 transition duration-200 hidden rounded-lg"
+              >
+                Logout
+              </button>
+            </li>
+          </ul>
+        </div>
+      </nav>
     </header>
-    <main>
-      <section id="profile-info">
-        <div id="user-profile"></div>
+    <main class="bg-slate-50 p-2">
+      <div
+        id="toast-container"
+        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 max-w-xs w-full z-50 flex flex-col items-center gap-4"
+      ></div>
+      <section id="profile-info" class="my-4">
+        <div id="user-profile" class="mx-auto text-center"></div>
       </section>
-
-      <section id="posts-container"></section>
+      <section class="my-4 flex items-center">
+        <a
+          href="/post/create/"
+          class="font-body bg-brand-triadic hover:bg-brand-hover text-white font-semibold p-2 rounded-full text-lg w-3/6 sm:w-2/5 mx-auto text-center"
+          >Create a New Post</a
+        >
+      </section>
+      <h2 class="text-3xl font-heading text-center font-bold my-8">My Posts</h2>
+      <section
+        id="posts-container"
+        class="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4 md:w-11/12 mx-auto"
+      ></section>
     </main>
+    <footer class="container mx-auto text-center bg-brand-dark max-w-full">
+      <p class="font-heading">Blikk | A Social media platform</p>
+      <p class="font-heading">Copyright &copy;</p>
+    </footer>
   </body>
 </html>

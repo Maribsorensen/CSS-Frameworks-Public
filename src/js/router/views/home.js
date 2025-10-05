@@ -1,5 +1,7 @@
 import { addComment, deleteComment, readPosts } from "../../api/post/read";
+import { toggleHamburgerMenu } from "../../ui/global/hamburger";
 import { setLogoutListener } from "../../ui/global/logout";
+import { updateNav } from "../../ui/global/updateNav";
 import { authGuard } from "../../utilities/authGuard";
 
 /**
@@ -23,30 +25,34 @@ import { authGuard } from "../../utilities/authGuard";
  */
 export function createPostElement(post) {
   const postElement = document.createElement("div");
-  postElement.classList.add("post");
+  postElement.classList.add("rounded-lg", "shadow-lg", "p-1", "flex", "flex-col", "justify-between", "bg-white");
 
   const titleElement = document.createElement("h2");
   titleElement.textContent = post.title;
+  titleElement.classList.add("font-heading", "text-xl", "font-semibold");
   postElement.appendChild(titleElement);
 
   const bodyElement = document.createElement("p");
   bodyElement.textContent = post.body;
+  bodyElement.classList.add("font-body", "text-lg");
   postElement.appendChild(bodyElement);
 
   const tagsElement = document.createElement("p");
   tagsElement.textContent = `Tags: ${post.tags.join(", ")}`;
+  tagsElement.classList.add("font-body", "text-gray-700");
   postElement.appendChild(tagsElement);
 
   if (post.author && post.author.name) {
     const authorElement = document.createElement("p");
     authorElement.textContent = `Written by: ${post.author.name}`;
+    authorElement.classList.add("font-body", "text-gray-700");
     postElement.appendChild(authorElement);
 
     if (post.author.avatar && post.author.avatar.url) {
       const avatarElement = document.createElement("img");
       avatarElement.setAttribute("src", post.author.avatar.url);
       avatarElement.setAttribute("alt", post.author.name);
-      avatarElement.classList.add("author-avatar");
+      avatarElement.classList.add("author-avatar", "rounded-[50%]", "w-14", "h-14");
       postElement.appendChild(avatarElement);
     }
   }
@@ -68,15 +74,17 @@ export function createPostElement(post) {
 
       const commentBody = document.createElement("p");
       commentBody.textContent = comment.body;
+      commentBody.classList.add("font-body");
       commentElement.appendChild(commentBody);
 
       const commentAuthor = document.createElement("small");
       commentAuthor.textContent = `by ${comment.author.name}`;
+      commentAuthor.classList.add("font-body");
       commentElement.appendChild(commentAuthor);
 
       const deleteButton = document.createElement("button");
       deleteButton.textContent = "Delete";
-      deleteButton.classList.add("delete-comment-button");
+      deleteButton.classList.add("delete-comment-button", "font-body");
       deleteButton.addEventListener("click", async () => {
         try {
           const confirmDelete = window.confirm("Are you sure you want to delete this comment?");
@@ -97,20 +105,23 @@ export function createPostElement(post) {
   } else {
     const noCommentsMessage = document.createElement("p");
     noCommentsMessage.textContent = "No comments yet.";
+    noCommentsMessage.classList.add("font-body");
     commentsSection.appendChild(noCommentsMessage);
   }
 
   const commentForm = document.createElement("form");
-  commentForm.classList.add("comment-form");
+  commentForm.classList.add("flex", "flex-col");
 
   const commentInput = document.createElement("textarea");
   commentInput.placeholder = "Add a comment...";
   commentInput.required = true;
+  commentInput.classList.add("font-body");
   commentForm.appendChild(commentInput);
 
   const submitButton = document.createElement("button");
   submitButton.textContent = "Submit Comment";
   submitButton.type = "submit";
+  submitButton.classList.add("font-body", "bg-brand-triadic", "hover:bg-brand-triadic_hover", "text-white", "font-semibold", "p-2", "m-2", "rounded-full");
   commentForm.appendChild(submitButton);
 
   commentForm.addEventListener("submit", async (event) => {
@@ -182,5 +193,6 @@ export async function displayPosts() {
 
 displayPosts();
 setLogoutListener();
-
+toggleHamburgerMenu();
+updateNav();
 authGuard();

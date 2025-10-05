@@ -1,5 +1,7 @@
 import { API_KEY, API_SOCIAL_POSTS } from "../../api/constants";
 import { getPostIdFromURL } from "../../api/post/update";
+import { toggleHamburgerMenu } from "../../ui/global/hamburger";
+import { updateNav } from "../../ui/global/updateNav";
 import { onUpdatePost } from "../../ui/post/update";
 import { authGuard } from "../../utilities/authGuard";
 
@@ -50,3 +52,6 @@ authGuard();
 
 const form = document.forms['editPost'];
 form.addEventListener('submit', onUpdatePost);
+
+toggleHamburgerMenu();
+updateNav();

@@ -1,4 +1,5 @@
 import { updatePost } from "../../api/post/update";
+import { showToast } from "../global/alert";
 
 /**
  * Passes data to the createPost function in api/post and handles the response
@@ -7,8 +8,14 @@ import { updatePost } from "../../api/post/update";
 export async function onUpdatePost(event) {
   event.preventDefault();
 
-
   const form = event.target;
+  const fieldset = form.querySelector("fieldset");
+  const button = form.querySelector("button");
+  const originalButtonText = button.textContent;
+
+  fieldset.disabled = true;
+  button.disabled = true;
+  button.textContent = "Updating...";
 
   const title = form.title.value;
   const body = form.body.value;
@@ -36,10 +43,15 @@ export async function onUpdatePost(event) {
   try {
     const updatedPost = await updatePost(postId, updatedPostData);
 
-    alert('Post updated successfully!');
-    window.location.href = `/profile/`;
+    showToast("Post updated successfully! Redirecting to your profile.", "success");
+    setTimeout(() => {
+      window.location.href = "/profile/";
+    }, 1500);
   } catch (error) {
-    console.error('Error updating post:', error);
-    alert('Failed to update post. Please try again.');
+    showToast(error.message || "An error occurred while updating the post.", "error");
+  } finally {
+    fieldset.disabled = false;
+    button.disabled = false;
+    button.textContent = originalButtonText;
   }
 }

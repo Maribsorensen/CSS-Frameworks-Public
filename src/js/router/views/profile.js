@@ -1,5 +1,8 @@
 import { addComment, deleteComment, readPostsByUser } from "../../api/post/read";
 import { readProfile } from "../../api/profile/read";
+import { toggleHamburgerMenu } from "../../ui/global/hamburger";
+import { setLogoutListener } from "../../ui/global/logout";
+import { updateNav } from "../../ui/global/updateNav";
 import { onDeletePost } from "../../ui/post/delete";
 import { authGuard } from "../../utilities/authGuard";
 
@@ -53,33 +56,48 @@ async function displayUserProfile() {
       const avatarUrl = profileData.avatar?.url || "default-avatar-url.jpg";
 
       const contentDiv = document.createElement("div");
-      contentDiv.classList.add("profile-content");
+      contentDiv.classList.add("container", "flex", "flex-col", "mx-auto", "rounded-lg", "shadow-lg", "p-1", "bg-white");
+
+      const avatarDiv = document.createElement("div");
+      avatarDiv.classList.add("avatar-container", "flex", "justify-center", "mb-4");
 
       const avatarImg = document.createElement("img");
       avatarImg.src = avatarUrl;
       avatarImg.alt = "Avatar";
-      avatarImg.classList.add("avatar");
-      contentDiv.appendChild(avatarImg);
+      avatarImg.classList.add("w-2/6", "h-auto");
+      avatarDiv.appendChild(avatarImg);
 
-      const profileName = document.createElement("h2");
+      contentDiv.appendChild(avatarDiv);
+
+      const infoDiv = document.createElement("div");
+      infoDiv.classList.add("profile-info", "text-center");
+
+      const profileName = document.createElement("h1");
       profileName.textContent = `${profileData.name}'s Profile`;
-      contentDiv.appendChild(profileName);
+      profileName.classList.add("text-xl", "font-bold", "font-heading", "mb-2");
+      infoDiv.appendChild(profileName);
 
       const bioPara = document.createElement("p");
       bioPara.textContent = `Bio: ${profileData.bio || "No bio available"}`;
-      contentDiv.appendChild(bioPara);
+      bioPara.classList.add("text-gray-600", "mb-2", "font-body");
+      infoDiv.appendChild(bioPara);
 
       const postsPara = document.createElement("p");
       postsPara.textContent = `Posts: ${profileData._count.posts}`;
-      contentDiv.appendChild(postsPara);
+      postsPara.classList.add("mb-1", "font-body");
+      infoDiv.appendChild(postsPara);
 
       const followersPara = document.createElement("p");
       followersPara.textContent = `Followers: ${profileData._count.followers}`;
-      contentDiv.appendChild(followersPara);
+      followersPara.classList.add("mb-1", "font-body");
+      infoDiv.appendChild(followersPara);
 
       const followingPara = document.createElement("p");
       followingPara.textContent = `Following: ${profileData._count.following}`;
-      contentDiv.appendChild(followingPara);
+      followingPara.classList.add("mb-1", "font-body");
+      infoDiv.appendChild(followingPara);
+
+      contentDiv.appendChild(infoDiv);
 
       profileContainer.appendChild(contentDiv);
     } else {
@@ -109,30 +127,34 @@ async function displayUserProfile() {
  */
 export function createProfilePostElement(post) {
   const postElement = document.createElement("div");
-  postElement.classList.add("post");
+  postElement.classList.add("rounded-lg", "shadow-lg", "p-1", "flex", "flex-col", "justify-between", "bg-white");
 
   const titleElement = document.createElement("h2");
   titleElement.textContent = post.title;
+  titleElement.classList.add("font-heading", "text-xl", "font-semibold");
   postElement.appendChild(titleElement);
 
   const bodyElement = document.createElement("p");
   bodyElement.textContent = post.body;
+  bodyElement.classList.add("font-body", "text-lg");
   postElement.appendChild(bodyElement);
 
   const tagsElement = document.createElement("p");
   tagsElement.textContent = `Tags: ${post.tags.join(", ")}`;
+  tagsElement.classList.add("font-body", "text-gray-700");
   postElement.appendChild(tagsElement);
 
   if (post.author && post.author.name) {
     const authorElement = document.createElement("p");
     authorElement.textContent = `Written by: ${post.author.name}`;
+    authorElement.classList.add("font-body", "text-gray-700");
     postElement.appendChild(authorElement);
 
     if (post.author.avatar && post.author.avatar.url) {
       const avatarElement = document.createElement("img");
       avatarElement.setAttribute("src", post.author.avatar.url);
       avatarElement.setAttribute("alt", post.author.name);
-      avatarElement.classList.add("author-avatar");
+      avatarElement.classList.add("author-avatar", "rounded-[50%]", "w-14", "h-14");
       postElement.appendChild(avatarElement);
     }
   }
@@ -154,15 +176,17 @@ export function createProfilePostElement(post) {
 
       const commentBody = document.createElement("p");
       commentBody.textContent = comment.body;
+      commentBody.classList.add("font-body");
       commentElement.appendChild(commentBody);
 
       const commentAuthor = document.createElement("small");
       commentAuthor.textContent = `by ${comment.author.name}`;
+      commentAuthor.classList.add("font-body");
       commentElement.appendChild(commentAuthor);
 
       const deleteButton = document.createElement("button");
       deleteButton.textContent = "Delete";
-      deleteButton.classList.add("delete-comment-button");
+      deleteButton.classList.add("delete-comment-button", "font-body");
       deleteButton.addEventListener("click", async () => {
         try {
           const confirmDelete = window.confirm("Are you sure you want to delete this comment?");
@@ -183,20 +207,23 @@ export function createProfilePostElement(post) {
   } else {
     const noCommentsMessage = document.createElement("p");
     noCommentsMessage.textContent = "No comments yet.";
+    noCommentsMessage.classList.add("font-body");
     commentsSection.appendChild(noCommentsMessage);
   }
 
   const commentForm = document.createElement("form");
-  commentForm.classList.add("comment-form");
+  commentForm.classList.add("flex", "flex-col");
 
   const commentInput = document.createElement("textarea");
   commentInput.placeholder = "Add a comment...";
   commentInput.required = true;
+  commentInput.classList.add("font-body");
   commentForm.appendChild(commentInput);
 
   const submitButton = document.createElement("button");
   submitButton.textContent = "Submit Comment";
   submitButton.type = "submit";
+  submitButton.classList.add("font-body", "bg-brand-triadic", "hover:bg-brand-triadic_hover", "text-white", "font-semibold", "p-2", "m-2", "rounded-full");
   commentForm.appendChild(submitButton);
 
   commentForm.addEventListener("submit", async (event) => {
@@ -238,6 +265,7 @@ export function createProfilePostElement(post) {
   if (username && post.author && post.author.name === username) {
     const editButton = document.createElement("button");
     editButton.textContent = "Edit Post";
+    editButton.classList.add("font-body", "bg-brand-dark", "py-2", "px-4", "hover:bg-brand-hover", "my-2");
     editButton.addEventListener("click", () => {
       const postId = post.id;
       window.location.href = `/post/edit/?id=${postId}`;
@@ -246,6 +274,7 @@ export function createProfilePostElement(post) {
 
     const deleteButton = document.createElement("button");
     deleteButton.textContent = "Delete Post";
+    deleteButton.classList.add("font-body", "bg-brand-dark", "py-2", "px-4", "hover:bg-brand-hover");
     deleteButton.addEventListener("click", onDeletePost);
     postElement.appendChild(deleteButton);
   }
@@ -260,4 +289,7 @@ export function createProfilePostElement(post) {
 
 displayProfilePosts();
 displayUserProfile();
+setLogoutListener();
+toggleHamburgerMenu();
+updateNav();
 authGuard();
