@@ -45,72 +45,67 @@ async function displayProfilePosts() {
  */
 async function displayUserProfile() {
   const username = localStorage.getItem("username");
+  const profileContainer = document.getElementById("user-profile");
+  profileContainer.innerHTML = "";
 
-  if (username) {
+  if (!username) {
+    profileContainer.innerHTML = `<p class="text-gray-600 font-body">No user logged in.</p>`;
+    return;
+  }
+
+  try {
     const profileData = await readProfile(username);
+    if (!profileData) throw new Error("No profile data");
 
-    const profileContainer = document.getElementById("user-profile");
-    profileContainer.innerHTML = "";
+    const avatarUrl = profileData.avatar?.url || "/src/assets/default-avatar.png";
 
-    if (profileData) {
-      const avatarUrl = profileData.avatar?.url || "default-avatar-url.jpg";
+    const card = document.createElement("div");
+    card.className = `
+      bg-white rounded-2xl shadow-lg max-w-xl mx-auto p-6 flex flex-col items-center gap-4
+    `;
 
-      const contentDiv = document.createElement("div");
-      contentDiv.classList.add("container", "flex", "flex-col", "mx-auto", "rounded-lg", "shadow-lg", "p-1", "bg-white");
+    const avatar = document.createElement("img");
+    avatar.src = avatarUrl;
+    avatar.alt = `${profileData.name} avatar`;
+    avatar.className = "w-28 h-28 rounded-full object-cover border-4 border-brand-triadic";
+    card.appendChild(avatar);
 
-      const avatarDiv = document.createElement("div");
-      avatarDiv.classList.add("avatar-container", "flex", "justify-center", "mb-4");
+    const name = document.createElement("h1");
+    name.textContent = profileData.name;
+    name.className = "text-2xl font-heading font-bold";
+    card.appendChild(name);
 
-      const avatarImg = document.createElement("img");
-      avatarImg.src = avatarUrl;
-      avatarImg.alt = "Avatar";
-      avatarImg.classList.add("w-2/6", "h-auto");
-      avatarDiv.appendChild(avatarImg);
+    const bio = document.createElement("p");
+    bio.textContent = profileData.bio || "No bio available.";
+    bio.className = "text-gray-600 text-sm text-center font-body";
+    card.appendChild(bio);
 
-      contentDiv.appendChild(avatarDiv);
+    const stats = document.createElement("div");
+    stats.className = "flex justify-center gap-6 mt-4 text-sm font-body";
 
-      const infoDiv = document.createElement("div");
-      infoDiv.classList.add("profile-info", "text-center");
+    stats.innerHTML = `
+      <div class="text-center">
+        <p class="font-bold text-lg">${profileData._count.posts}</p>
+        <p class="text-gray-500">Posts</p>
+      </div>
+      <div class="text-center">
+        <p class="font-bold text-lg">${profileData._count.followers}</p>
+        <p class="text-gray-500">Followers</p>
+      </div>
+      <div class="text-center">
+        <p class="font-bold text-lg">${profileData._count.following}</p>
+        <p class="text-gray-500">Following</p>
+      </div>
+    `;
+    card.appendChild(stats);
 
-      const profileName = document.createElement("h1");
-      profileName.textContent = `${profileData.name}'s Profile`;
-      profileName.classList.add("text-xl", "font-bold", "font-heading", "mb-2");
-      infoDiv.appendChild(profileName);
-
-      const bioPara = document.createElement("p");
-      bioPara.textContent = `Bio: ${profileData.bio || "No bio available"}`;
-      bioPara.classList.add("text-gray-600", "mb-2", "font-body");
-      infoDiv.appendChild(bioPara);
-
-      const postsPara = document.createElement("p");
-      postsPara.textContent = `Posts: ${profileData._count.posts}`;
-      postsPara.classList.add("mb-1", "font-body");
-      infoDiv.appendChild(postsPara);
-
-      const followersPara = document.createElement("p");
-      followersPara.textContent = `Followers: ${profileData._count.followers}`;
-      followersPara.classList.add("mb-1", "font-body");
-      infoDiv.appendChild(followersPara);
-
-      const followingPara = document.createElement("p");
-      followingPara.textContent = `Following: ${profileData._count.following}`;
-      followingPara.classList.add("mb-1", "font-body");
-      infoDiv.appendChild(followingPara);
-
-      contentDiv.appendChild(infoDiv);
-
-      profileContainer.appendChild(contentDiv);
-    } else {
-      const errorMessage = document.createElement("p");
-      errorMessage.textContent = "Error loading profile information.";
-      profileContainer.appendChild(errorMessage);
-    }
-  } else {
-    const noUserMessage = document.createElement("p");
-    noUserMessage.textContent = "No user logged in.";
-    profileContainer.appendChild(noUserMessage);
+    profileContainer.appendChild(card);
+  } catch (error) {
+    console.error("Error loading profile info:", error);
+    profileContainer.innerHTML = `<p class="text-red-600 font-body">Error loading profile information.</p>`;
   }
 }
+
 
 /**
  * Creates a DOM element for a user's post.
@@ -126,165 +121,215 @@ async function displayUserProfile() {
  * @returns {HTMLElement} The DOM element representing the post.
  */
 export function createProfilePostElement(post) {
+  const currentUser = localStorage.getItem("username");
   const postElement = document.createElement("div");
-  postElement.classList.add("rounded-lg", "shadow-lg", "p-1", "flex", "flex-col", "justify-between", "bg-white");
+  postElement.className = `
+    relative
+    bg-white rounded-2xl overflow-hidden shadow-md flex flex-col
+    hover:shadow-lg transition-shadow duration-200
+  `;
+  postElement.setAttribute("data-post-id", post.id);
+
+  if (currentUser && post.author?.name === currentUser) {
+    const controls = document.createElement("div");
+    controls.className = "absolute top-2 right-2 flex gap-2 z-50 bg-black bg-opacity-60 rounded";
+
+    const editButton = document.createElement("button");
+    editButton.title = "Edit post";
+    editButton.innerHTML = "✏️";
+    editButton.className = `
+      text-gray-600 hover:text-brand-dark text-lg
+      transition transform hover:scale-110
+    `;
+    editButton.addEventListener("click", () => {
+      window.location.href = `/post/edit/?id=${post.id}`;
+    });
+    controls.appendChild(editButton);
+
+    const deleteButton = document.createElement("button");
+    deleteButton.title = "Delete post";
+    deleteButton.innerHTML = "🗑️";
+    deleteButton.className = `
+      text-gray-600 hover:text-red-600 text-lg
+      transition transform hover:scale-110
+    `;
+    deleteButton.addEventListener("click", onDeletePost);
+    controls.appendChild(deleteButton);
+
+    postElement.appendChild(controls);
+  }
+
+  if (post.media?.url) {
+    const imageWrapper = document.createElement("div");
+    imageWrapper.className = "relative w-full aspect-[16/9] bg-gray-100";
+
+    const imageElement = document.createElement("img");
+    imageElement.src = post.media.url;
+    imageElement.alt = post.media.alt || "Post image";
+    imageElement.className = "absolute inset-0 w-full h-full object-cover";
+
+    imageWrapper.appendChild(imageElement);
+    postElement.appendChild(imageWrapper);
+  }
+
+  const contentDiv = document.createElement("div");
+  contentDiv.className = "p-4 flex flex-col gap-2 flex-grow";
 
   const titleElement = document.createElement("h2");
   titleElement.textContent = post.title;
-  titleElement.classList.add("font-heading", "text-xl", "font-semibold");
-  postElement.appendChild(titleElement);
+  titleElement.className = "font-heading text-lg font-semibold";
+  contentDiv.appendChild(titleElement);
 
   const bodyElement = document.createElement("p");
   bodyElement.textContent = post.body;
-  bodyElement.classList.add("font-body", "text-lg");
-  postElement.appendChild(bodyElement);
+  bodyElement.className = "font-body text-sm text-gray-700";
+  contentDiv.appendChild(bodyElement);
 
-  const tagsElement = document.createElement("p");
-  tagsElement.textContent = `Tags: ${post.tags.join(", ")}`;
-  tagsElement.classList.add("font-body", "text-gray-700");
-  postElement.appendChild(tagsElement);
+  if (post.tags?.length) {
+    const tagsElement = document.createElement("p");
+    tagsElement.textContent = post.tags.map(tag => `#${tag}`).join(" ");
+    tagsElement.className = "text-xs text-gray-500 font-body italic";
+    contentDiv.appendChild(tagsElement);
+  }
 
-  if (post.author && post.author.name) {
-    const authorElement = document.createElement("p");
-    authorElement.textContent = `Written by: ${post.author.name}`;
-    authorElement.classList.add("font-body", "text-gray-700");
-    postElement.appendChild(authorElement);
+  if (post.author?.name) {
+    const authorDiv = document.createElement("div");
+    authorDiv.className = "flex items-center mt-3";
 
-    if (post.author.avatar && post.author.avatar.url) {
+    if (post.author.avatar?.url) {
       const avatarElement = document.createElement("img");
-      avatarElement.setAttribute("src", post.author.avatar.url);
-      avatarElement.setAttribute("alt", post.author.name);
-      avatarElement.classList.add("author-avatar", "rounded-[50%]", "w-14", "h-14");
-      postElement.appendChild(avatarElement);
+      avatarElement.src = post.author.avatar.url;
+      avatarElement.alt = `${post.author.name}'s avatar`;
+      avatarElement.className = "w-10 h-10 rounded-full mr-3 object-cover";
+      authorDiv.appendChild(avatarElement);
     }
+
+    const nameElement = document.createElement("span");
+    nameElement.textContent = post.author.name;
+    nameElement.className = "font-body text-sm text-gray-800 font-medium";
+    authorDiv.appendChild(nameElement);
+
+    contentDiv.appendChild(authorDiv);
   }
 
-  if (post.media && post.media.url) {
-    const imageElement = document.createElement("img");
-    imageElement.setAttribute("src", post.media.url);
-    imageElement.setAttribute("alt", post.media.alt || "Post image");
-    postElement.appendChild(imageElement);
-  }
+  postElement.appendChild(contentDiv);
 
   const commentsSection = document.createElement("div");
-  commentsSection.classList.add("comments-section");
+  commentsSection.className = "border-t border-gray-200 p-4 space-y-2 mt-auto";
 
-  if (post.comments && post.comments.length > 0) {
+  if (post.comments?.length) {
     post.comments.forEach(comment => {
       const commentElement = document.createElement("div");
-      commentElement.classList.add("comment");
+      commentElement.className = "bg-gray-50 p-2 rounded-lg flex justify-between items-start text-sm";
 
+      const textContainer = document.createElement("div");
       const commentBody = document.createElement("p");
       commentBody.textContent = comment.body;
-      commentBody.classList.add("font-body");
-      commentElement.appendChild(commentBody);
+      textContainer.appendChild(commentBody);
 
       const commentAuthor = document.createElement("small");
       commentAuthor.textContent = `by ${comment.author.name}`;
-      commentAuthor.classList.add("font-body");
-      commentElement.appendChild(commentAuthor);
+      commentAuthor.className = "text-gray-500 block";
+      textContainer.appendChild(commentAuthor);
 
-      const deleteButton = document.createElement("button");
-      deleteButton.textContent = "Delete";
-      deleteButton.classList.add("delete-comment-button", "font-body");
-      deleteButton.addEventListener("click", async () => {
-        try {
-          const confirmDelete = window.confirm("Are you sure you want to delete this comment?");
+      commentElement.appendChild(textContainer);
+
+      if (comment.author.name === currentUser) {
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "×";
+        deleteButton.className = "text-gray-400 hover:text-red-500 font-bold ml-2";
+        deleteButton.addEventListener("click", async () => {
+          const confirmDelete = window.confirm("Delete this comment?");
           if (confirmDelete) {
-            const success = await deleteComment(post.id, comment.id);
-            if (success) {
-              commentElement.remove();
+            try {
+              const success = await deleteComment(post.id, comment.id);
+              if (success) commentElement.remove();
+            } catch (err) {
+              console.error("Error deleting comment:", err);
             }
           }
-        } catch (error) {
-          console.error("Error deleting comment:", error);
-        }
-      });
+        });
+        commentElement.appendChild(deleteButton);
+      }
 
-      commentElement.appendChild(deleteButton);
       commentsSection.appendChild(commentElement);
     });
   } else {
-    const noCommentsMessage = document.createElement("p");
-    noCommentsMessage.textContent = "No comments yet.";
-    noCommentsMessage.classList.add("font-body");
-    commentsSection.appendChild(noCommentsMessage);
+    const noComments = document.createElement("p");
+    noComments.textContent = "No comments yet.";
+    noComments.className = "text-sm text-gray-500 font-body";
+    commentsSection.appendChild(noComments);
   }
 
   const commentForm = document.createElement("form");
-  commentForm.classList.add("flex", "flex-col");
+  commentForm.className = "mt-3 flex flex-col gap-2";
 
   const commentInput = document.createElement("textarea");
   commentInput.placeholder = "Add a comment...";
   commentInput.required = true;
-  commentInput.classList.add("font-body");
+  commentInput.className = "border rounded-lg p-2 text-sm font-body resize-none focus:ring focus:ring-brand-triadic";
   commentForm.appendChild(commentInput);
 
   const submitButton = document.createElement("button");
-  submitButton.textContent = "Submit Comment";
+  submitButton.textContent = "Submit";
   submitButton.type = "submit";
-  submitButton.classList.add("font-body", "bg-brand-triadic", "hover:bg-brand-triadic_hover", "text-white", "font-semibold", "p-2", "m-2", "rounded-full");
+  submitButton.className = "bg-brand-triadic hover:bg-brand-triadic_hover text-white text-sm font-semibold py-1.5 rounded-lg transition";
   commentForm.appendChild(submitButton);
 
-  commentForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const commentBody = commentInput.value;
+  commentForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const body = commentInput.value.trim();
+    if (!body) return;
 
     try {
-      const newComment = await addComment(post.id, commentBody);
+      const newComment = await addComment(post.id, body);
       const newCommentElement = document.createElement("div");
-      newCommentElement.classList.add("comment");
-      newCommentElement.innerHTML = `<p>${newComment.body}</p><small>by ${newComment.author.name}</small>`;
+      newCommentElement.className = "bg-gray-50 p-2 rounded-lg flex justify-between items-start text-sm";
 
-      const deleteButton = document.createElement("button");
-      deleteButton.textContent = "Delete";
-      deleteButton.addEventListener("click", async () => {
-        try {
-          const confirmDelete = window.confirm("Are you sure you want to delete this comment?");
+      const textContainer = document.createElement("div");
+      const p = document.createElement("p");
+      p.textContent = newComment.body;
+      textContainer.appendChild(p);
+
+      const author = document.createElement("small");
+      author.textContent = `by ${newComment.author.name}`;
+      author.className = "text-gray-500 block";
+      textContainer.appendChild(author);
+
+      newCommentElement.appendChild(textContainer);
+
+      if (newComment.author.name === currentUser) {
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "×";
+        deleteButton.className = "text-gray-400 hover:text-red-500 font-bold ml-2";
+        deleteButton.addEventListener("click", async () => {
+          const confirmDelete = window.confirm("Delete this comment?");
           if (confirmDelete) {
-            const success = await deleteComment(post.id, newComment.id);
-            if (success) {
-              newCommentElement.remove();
+            try {
+              const success = await deleteComment(post.id, newComment.id);
+              if (success) newCommentElement.remove();
+            } catch (err) {
+              console.error("Error deleting comment:", err);
             }
           }
-        } catch (error) {
-          console.error("Error deleting comment:", error);
-        }
-      });
+        });
+        newCommentElement.appendChild(deleteButton);
+      }
 
-      newCommentElement.appendChild(deleteButton);
       commentsSection.appendChild(newCommentElement);
       commentInput.value = "";
-    } catch (error) {
-      console.error("Error adding comment:", error);
+    } catch (err) {
+      console.error("Error adding comment:", err);
     }
   });
 
-  const username = localStorage.getItem("username");
-  if (username && post.author && post.author.name === username) {
-    const editButton = document.createElement("button");
-    editButton.textContent = "Edit Post";
-    editButton.classList.add("font-body", "bg-brand-dark", "py-2", "px-4", "hover:bg-brand-hover", "my-2");
-    editButton.addEventListener("click", () => {
-      const postId = post.id;
-      window.location.href = `/post/edit/?id=${postId}`;
-    });
-    postElement.appendChild(editButton);
-
-    const deleteButton = document.createElement("button");
-    deleteButton.textContent = "Delete Post";
-    deleteButton.classList.add("font-body", "bg-brand-dark", "py-2", "px-4", "hover:bg-brand-hover");
-    deleteButton.addEventListener("click", onDeletePost);
-    postElement.appendChild(deleteButton);
-  }
-
+  commentsSection.appendChild(commentForm);
   postElement.appendChild(commentsSection);
-  postElement.appendChild(commentForm);
-  postElement.setAttribute("data-post-id", post.id);
 
   return postElement;
 }
+
+
 
 
 displayProfilePosts();
