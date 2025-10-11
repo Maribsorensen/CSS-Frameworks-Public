@@ -80,3 +80,7 @@ Additional improvements, based on teacher feedback and own wants:
 - **Post cards styling** - Cards have gotten a full style change. Set image size and fixed positions for better accessibility and symetrical structure
 - **Deleted unused files** - All unused files from the previous project have been deleted
 - **Delete comments** - The delete post comment have been fixed to be a smaller icon, as well as only visible for the owner of that comment
+
+[Cloned Reposiroty Commit](https://github.com/Maribsorensen/CSS-Frameworks-Public/commit/01b0017988f2a20948dd99101b7922287310d3a1)
+[CSS Framworks Code Commit](https://github.com/Maribsorensen/CSS-Frameworks-Public/commit/783b6a653d524df441f6f4b5f14b7e7b07e4f61d)
+[Styling Commit](https://github.com/Maribsorensen/CSS-Frameworks-Public/commit/10102ff601d2ea5dc3b747029e3a7682f633e451)
